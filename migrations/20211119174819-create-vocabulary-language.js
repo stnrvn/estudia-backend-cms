@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('vocabularyLanguages', {
+    await queryInterface.createTable('VocabularyLanguages', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -31,6 +31,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('vocabularyLanguages');
+    await queryInterface.dropTable('VocabularyLanguages');
   }
 };
