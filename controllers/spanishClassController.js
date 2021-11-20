@@ -20,9 +20,35 @@ class SpanishClassController{
 
   static async get(req, res){
     try {
-      const response = await SpanishClass.findAll()
+      const { Op } = require("sequelize")
+      const { title, page, length } = req.query
 
-      return res.json(response)
+      let dataFilter = {
+        title: ''
+      }
+
+      title ? dataFilter.title = { [Op.like]: `%${title}%` } : delete dataFilter.title
+      
+      function isEmpty(dataFilter) {
+        for(var key in dataFilter) {
+          if(dataFilter.hasOwnProperty(key))
+          return false;
+        }
+        return true;
+      }
+
+      let condition = isEmpty(dataFilter) ? '' : dataFilter
+
+      const response = await SpanishClass.findAndCountAll({
+        offset: +page,
+        limit: +length,
+        where: condition,
+        order: [
+            ['id', 'ASC']
+        ],
+      })
+
+      return res.status(200).json(response)
     } catch (error) {
       return res.status(500).json(error)  
     }
