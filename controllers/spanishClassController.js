@@ -5,6 +5,7 @@ class SpanishClassController{
     try {
       const payload = {
         title: req.body.title,
+        image: req.file.path,
         body: req.body.body,
         description: req.body.description,
         featured: req.body.featured
@@ -39,12 +40,14 @@ class SpanishClassController{
 
       let condition = isEmpty(dataFilter) ? '' : dataFilter
 
+      let offset = 0 + ((+page)- 1) * (+length)
+
       const response = await SpanishClass.findAndCountAll({
-        offset: +page,
+        offset: offset,
         limit: +length,
         where: condition,
         order: [
-            ['id', 'ASC']
+            ['id', 'DESC']
         ],
       })
 
@@ -75,6 +78,7 @@ class SpanishClassController{
       const id = +req.params.id
       const payload = {
         title: req.body.title,
+        // image: req.file.path,
         body: req.body.body,
         description: req.body.description,
         featured: req.body.featured

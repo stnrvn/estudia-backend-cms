@@ -7,7 +7,8 @@ class UserController{
     try {
       const opt = {
         username: req.body.username,
-        password: req.body.password
+        password: req.body.password,
+        role: req.body.role
       }
 
       const result = await User.create(opt)
@@ -19,7 +20,7 @@ class UserController{
       return res.status(201).json(response) 
     } catch (error) {
       return res.status(500).json({
-        message: error.errors[0].message
+        message: error
       })
     }
   }
@@ -64,8 +65,105 @@ class UserController{
         }
     } catch (error) {
         return res.status(500).json({
-          message: error.errors[0].message
+          error
         })
+    }
+  }
+
+  static async get(req, res){
+    try {
+      const { Op } = require("sequelize")
+      const { username, page, length } = req.query
+
+      let dataFilter = {
+        username: ''
+      }
+
+      username ? dataFilter.username = { [Op.like]: `%${username}%` } : delete dataFilter.username
+      
+      function isEmpty(dataFilter) {
+        for(var key in dataFilter) {
+          if(dataFilter.hasOwnProperty(key))
+          return false;
+        }
+        return true;
+      }
+
+      let condition = isEmpty(dataFilter) ? '' : dataFilter
+
+      const response = await User.findAndCountAll({
+        offset: (+page - 1) * (+length),
+        limit: +length,
+        where: condition,
+        order: [
+            ['id', 'DESC']
+        ],
+      })
+
+      return res.status(200).json(response)
+    } catch (error) {
+      return res.status(500).json(error)  
+    }
+  }
+
+  static async getById(req, res){
+    try {
+      const id = +req.params.id
+
+      const response = await User.findOne({
+        where: {
+          id
+        }
+      })
+
+      return res.status(200).json(response)
+    } catch (error) {
+      return res.status(500).json(error)
+    }
+  }
+
+  static async update(req, res){
+    try {
+      const id = +req.params.id
+      const payload = {
+        username: req.body.username,
+        password: req.body.username
+      }
+
+      const response = await User.update(payload, {
+        where: {
+            id
+        },
+        returning: true
+      })
+
+      return res.status(200).json(response)
+    } catch (error) {
+      return res.status(500).json(error)
+    }
+  }
+
+  static async delete(req, res){
+    try {
+      const id = +req.params.id
+
+      const response = await User.destroy({
+        where: {
+          id
+        }
+      })
+
+      if(!response){
+        return res.status(404).json({
+          message: 'error not found'
+        })
+      }
+
+      return res.status(200).json({
+        message: 'data success to delete'
+      })
+    } catch (error) {
+      return res.status(500).json(error)
     }
   }
 }

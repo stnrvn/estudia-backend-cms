@@ -1,7 +1,7 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('VocabularyLanguages', {
+    await queryInterface.createTable('Blogs', {
       id: {
         allowNull: false,
         autoIncrement: true,
@@ -11,6 +11,9 @@ module.exports = {
       title: {
         type: Sequelize.STRING
       },
+      image: {
+        type: Sequelize.STRING
+      },
       body: {
         type: Sequelize.STRING
       },
@@ -18,7 +21,7 @@ module.exports = {
         type: Sequelize.STRING
       },
       featured: {
-        type: Sequelize.BOOLEAN
+        type: Sequelize.STRING
       },
       createdAt: {
         allowNull: false,
@@ -31,6 +34,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('VocabularyLanguages');
+    await queryInterface.dropTable('Blogs');
   }
 };

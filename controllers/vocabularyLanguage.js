@@ -6,6 +6,7 @@ class VocabularyLanguageController{
       const payload = {
         title: req.body.title,
         body: req.body.body,
+        image: req.file.path,
         description: req.body.description,
         featured: req.body.featured
       }
@@ -21,30 +22,38 @@ class VocabularyLanguageController{
   static async get(req, res){
     try {
       const { Op } = require("sequelize")
-      const { title, page, length } = req.query
+      const { title, page, length, featured } = req.query
 
       let dataFilter = {
         title: ''
       }
 
-      title ? dataFilter.title = { [Op.like]: `%${title}%` } : delete dataFilter.title
+      let condition
       
-      function isEmpty(dataFilter) {
-        for(var key in dataFilter) {
-          if(dataFilter.hasOwnProperty(key))
-          return false;
+      if(featured === 'yes'){
+        condition = {
+          featured: true
         }
-        return true;
+      } else {
+        title ? dataFilter.title = { [Op.like]: `%${title}%` } : delete dataFilter.title
+
+        function isEmpty(dataFilter) {
+          for(var key in dataFilter) {
+            if(dataFilter.hasOwnProperty(key))
+            return false;
+          }
+          return true;
+        }
+
+        condition = isEmpty(dataFilter) ? '' : dataFilter
       }
 
-      let condition = isEmpty(dataFilter) ? '' : dataFilter
-
       const response = await VocabularyLanguage.findAndCountAll({
-        offset: +page,
+        offset: (+page - 1) * (+length),
         limit: +length,
         where: condition,
         order: [
-            ['id', 'ASC']
+            ['id', 'DESC']
         ],
       })
 
@@ -76,6 +85,7 @@ class VocabularyLanguageController{
       const payload = {
         title: req.body.title,
         body: req.body.body,
+        // image: req.file.path,
         description: req.body.description,
         featured: req.body.featured
       }
